@@ -1,15 +1,17 @@
 import psycopg2
 
 # 1. Функция, создающая структуру БД (таблицы).
+
 def create_table(cur):
     cur.execute("""
     CREATE TABLE IF NOT EXISTS Client(
         id SERIAL PRIMARY KEY,
         name VARCHAR(40) NOT NULL,
-        second name VARCHAR(40) NOT NULL,
+        surname VARCHAR(40) NOT NULL,
         email VARCHAR(40) NOT NULL
     );
     """)
+
     cur.execute("""
     CREATE TABLE IF NOT EXISTS Phone(
         id SERIAL PRIMARY KEY,
@@ -23,13 +25,13 @@ def create_table(cur):
 
 def add_client(cur):
     name = input("Input name: ")
-    surname = input("Input second_name: ")
+    surname = input("Input surname: ")
     email = input("Input email: ")
     cur.execute("""
-    INSERT INTO Client(name, second_name, email) VALUES(%s, %s, %s);
-    """, (name, second_name, email))
+    INSERT INTO Client(name, surname, email) VALUES(%s, %s, %s);
+    """, (name, surname, email))
     if cur.rowcount > 0:
-       return f"Client {name} {second_name} is exists now"
+       return f"Client {name} {surname} is exists now"
     return "New client not added"
 
 # 3. Функция, позволяющая добавить телефон для существующего клиента.
@@ -49,14 +51,14 @@ def add_phone(cur):
 
 def update_client(cur):
     name = input('Name: ')
-    surname = input('Second name: ')
+    surname = input('Surname: ')
     email = input('Email: ')
     phone = int(input('Phone: '))
     id = int(input('Phone_id: '))
     client_id = int(input('Client_id: '))
     cur.execute("""
-        UPDATE Client SET name=%s, second_name=%s, email=%s WHERE id=%s;
-        """, (name, second_name, email, id))
+        UPDATE Client SET name=%s, surname=%s, email=%s WHERE id=%s;
+        """, (name, surname, email, id))
     cur.execute("""
             UPDATE Phone SET phone=%s WHERE client_id=%s;
             """, (phone, id, ))
@@ -84,12 +86,12 @@ def delete_client(cur):
 
 def search_client(cur):
     name = input('Please insert name for search: ')
-    surname = input('Please insert second name for search: ')
+    surname = input('Please insert surname for search: ')
     email = input('Please insert email for search: ')
     phone = input('Please insert phone for search: ')
     cur.execute("""
-        SELECT id FROM Client WHERE name=%s AND second_name=%s AND email=%s;
-        """, (name, second_name, email))
+        SELECT id FROM Client WHERE name=%s AND surname=%s AND email=%s;
+        """, (name, surname, email))
     cur.execute("""
             SELECT client_id FROM Phone WHERE phone=%s;
             """, (phone, ))
@@ -101,12 +103,8 @@ def search_client(cur):
     print(f'Found a client with id: {client[0][0]}')
 
 if __name__  == '__main__':
-    with psycopg2.connect(database="SQL_HW_5", user="postgres", password="postgres") as conn:
+    with psycopg2.connect(database="SQL_HW_5", user="postgres", password="1") as conn:
         with conn.cursor() as cur:
-            cur.execute("""
-            DROP TABLE Phone;
-            DROP TABLE Client;
-            """)
             create_table(cur)
             add_client(cur)
             add_phone(cur)
